@@ -23,6 +23,9 @@ import QuickLook
 import QuickLookThumbnailing
 import UIKit
 
+import PDFNet
+import Tools
+
 public class FileDetailsViewController: UIViewController, CoreWebViewLinkDelegate, ErrorViewController, PageViewEventViewControllerLoggingProtocol {
     @IBOutlet weak var spinnerView: CircleProgressView!
     @IBOutlet weak var arButton: UIButton!
@@ -316,49 +319,51 @@ extension FileDetailsViewController: QLPreviewControllerDataSource, QLPreviewCon
     }
 }
 
-extension FileDetailsViewController: PDFViewControllerDelegate {
+extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewControllerDelegate {
     func embedPDFView(for url: URL) {
         guard DocViewerViewController.hasPSPDFKitLicense else {
             return embedWebView(for: url)
         }
         stylePSPDFKit()
 
-        let document = Document(url: url)
-        document.annotationSaveMode = .embedded
-        let controller = PDFViewController(document: document, configuration: PDFConfiguration { (builder) -> Void in
-            docViewerConfigurationBuilder(builder)
-            builder.editableAnnotationTypes = [ .link, .highlight, .underline, .strikeOut, .squiggly, .freeText, .ink, .square, .circle, .line, .polygon, .eraser ]
-            builder.propertiesForAnnotations[.square] = [["color"], ["lineWidth"]]
-            builder.propertiesForAnnotations[.circle] = [["color"], ["lineWidth"]]
-            builder.propertiesForAnnotations[.line] = [["color"], ["lineWidth"]]
-            builder.propertiesForAnnotations[.polygon] = [["color"], ["lineWidth"]]
-            builder.sharingConfigurations = [ DocumentSharingConfiguration { builder in
-                builder.annotationOptions = .flatten
-                builder.pageSelectionOptions = .all
-            }, ]
-
-            // Override the override
-            builder.overrideClass(AnnotationToolbar.self, with: AnnotationToolbar.self)
-        })
-        controller.annotationToolbarController?.toolbar.toolbarPosition = .left
-        if #available(iOS 13, *) {
-            let appearance = UIToolbarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = navigationController?.navigationBar.barTintColor
-            controller.annotationToolbarController?.toolbar.standardAppearance = appearance
-        }
+        let document = PTPDFDoc(filepath: url.path)!
+        let controller = PTDocumentViewController()
+        controller.openDocument(with: document)
+//        document.annotationSaveMode = .embedded
+//        let controller = PDFViewController(document: document, configuration: PDFConfiguration { (builder) -> Void in
+//            docViewerConfigurationBuilder(builder)
+//            builder.editableAnnotationTypes = [ .link, .highlight, .underline, .strikeOut, .squiggly, .freeText, .ink, .square, .circle, .line, .polygon, .eraser ]
+//            builder.propertiesForAnnotations[.square] = [["color"], ["lineWidth"]]
+//            builder.propertiesForAnnotations[.circle] = [["color"], ["lineWidth"]]
+//            builder.propertiesForAnnotations[.line] = [["color"], ["lineWidth"]]
+//            builder.propertiesForAnnotations[.polygon] = [["color"], ["lineWidth"]]
+//            builder.sharingConfigurations = [ DocumentSharingConfiguration { builder in
+//                builder.annotationOptions = .flatten
+//                builder.pageSelectionOptions = .all
+//            }, ]
+//
+//            // Override the override
+//            builder.overrideClass(AnnotationToolbar.self, with: AnnotationToolbar.self)
+//        })
+//        controller.annotationToolbarController?.toolbar.toolbarPosition = .left
+//        if #available(iOS 13, *) {
+//            let appearance = UIToolbarAppearance()
+//            appearance.configureWithOpaqueBackground()
+//            appearance.backgroundColor = navigationController?.navigationBar.barTintColor
+//            controller.annotationToolbarController?.toolbar.standardAppearance = appearance
+//        }
         controller.delegate = self
         embed(controller, in: contentView)
         addPDFAnnotationChangeNotifications()
 
-        let share = UIBarButtonItem(barButtonSystemItem: .action, target: controller.activityButtonItem.target, action: controller.activityButtonItem.action)
-        share.accessibilityIdentifier = "FileDetails.shareButton"
-        let annotate = controller.annotationButtonItem
-        annotate.image = .icon(.highlighter, .line)
-        annotate.accessibilityIdentifier = "FileDetails.annotateButton"
-        let search = controller.searchButtonItem
-        search.accessibilityIdentifier = "FileDetails.searchButton"
-        navigationItem.rightBarButtonItems = [ share, annotate, search ]
+//        let share = UIBarButtonItem(barButtonSystemItem: .action, target: controller.activityButtonItem.target, action: controller.activityButtonItem.action)
+//        share.accessibilityIdentifier = "FileDetails.shareButton"
+//        let annotate = controller.annotationButtonItem
+//        annotate.image = .icon(.highlighter, .line)
+//        annotate.accessibilityIdentifier = "FileDetails.annotateButton"
+//        let search = controller.searchButtonItem
+//        search.accessibilityIdentifier = "FileDetails.searchButton"
+//        navigationItem.rightBarButtonItems = [ share, annotate, search ]
         NotificationCenter.default.post(name: .init("FileViewControllerBarButtonItemsDidChange"), object: nil)
 
         doneLoading()

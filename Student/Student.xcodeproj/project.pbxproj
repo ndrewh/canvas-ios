@@ -1843,6 +1843,7 @@
 				F9B947052215E97A0083E660 /* Carthage Copy Frameworks */,
 				3B6DCCB51FB502CE005EE8D2 /* Embed App Extensions */,
 				3B3B5B202421D91300620291 /* FirebaseCrashlytics */,
+				24CB15E18F5C7CE4E43A5217 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1883,6 +1884,7 @@
 				7DE1160422F8AAB1005BFE98 /* Frameworks */,
 				7DE1160522F8AAB1005BFE98 /* Resources */,
 				44259AD61BD98E54DC51390F /* [CP] Embed Pods Frameworks */,
+				C6D84AED52D2A0F37A34B0CA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -2197,6 +2199,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		24CB15E18F5C7CE4E43A5217 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-Student/Pods-defaults-Student-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-Student/Pods-defaults-Student-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-defaults-Student/Pods-defaults-Student-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		3B3B5B202421D91300620291 /* FirebaseCrashlytics */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 12;
@@ -2317,6 +2336,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-defaults-Student/Pods-defaults-Student-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C6D84AED52D2A0F37A34B0CA /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-StudentUnitTests/Pods-defaults-StudentUnitTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-StudentUnitTests/Pods-defaults-StudentUnitTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-defaults-StudentUnitTests/Pods-defaults-StudentUnitTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F9B947052215E97A0083E660 /* Carthage Copy Frameworks */ = {

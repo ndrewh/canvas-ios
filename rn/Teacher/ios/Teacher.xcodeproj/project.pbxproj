@@ -708,6 +708,7 @@
 				B714E89FBF87F7C6C1A4CBF2 /* [CP] Embed Pods Frameworks */,
 				F9B947072215EA3C0083E660 /* Carthage Copy Frameworks */,
 				3BA649CB242289290047D8DC /* FirebaseCrashlytics */,
+				375274AE67D55A46DDA890D6 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -728,6 +729,7 @@
 				B15CA25B221DDB820014FB02 /* Resources */,
 				AF77E971FEE0456B393856EF /* [CP] Embed Pods Frameworks */,
 				7DBF923A226978FC00710D0F /* Embed Frameworks */,
+				5077236EDA06A2DE2D2FEB59 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -911,6 +913,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		375274AE67D55A46DDA890D6 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-Teacher/Pods-defaults-Teacher-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-Teacher/Pods-defaults-Teacher-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-defaults-Teacher/Pods-defaults-Teacher-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		3BA649CB242289290047D8DC /* FirebaseCrashlytics */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -959,6 +978,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+		};
+		5077236EDA06A2DE2D2FEB59 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-TeacherTests/Pods-defaults-TeacherTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-TeacherTests/Pods-defaults-TeacherTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-defaults-TeacherTests/Pods-defaults-TeacherTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 		5AB2BCD6CC4B25C00B73A429 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

@@ -20,6 +20,9 @@ import UIKit
 import PSPDFKit
 import PSPDFKitUI
 
+import PDFNet
+import Tools
+
 public class DocViewerViewController: UIViewController {
     @IBOutlet weak var contentView: UIView!
     @IBOutlet weak var loadingView: CircleProgressView!
@@ -32,7 +35,7 @@ public class DocViewerViewController: UIViewController {
     var filename = ""
     var metadata: APIDocViewerMetadata?
     weak var parentNavigationItem: UINavigationItem?
-    let pdf = PDFViewController()
+    let pdf = PTDocumentViewController()
     var previewURL: URL?
     lazy var session = DocViewerSession { [weak self] in
         performUIUpdate { self?.sessionIsReady() }
@@ -65,7 +68,7 @@ public class DocViewerViewController: UIViewController {
 
         embed(pdf, in: contentView)
         pdf.view.isHidden = true
-        pdf.updateConfiguration(builder: docViewerConfigurationBuilder)
+//        pdf.updateConfiguration(builder: docViewerConfigurationBuilder)
         pdf.delegate = self
 
         syncAnnotationsButton.isHidden = true
@@ -105,13 +108,14 @@ public class DocViewerViewController: UIViewController {
                 }
             }
         }
-        load(document: document)
+        let doc = PTPDFDoc(filepath: localURL.path)!
+        load(document: doc)
     }
 
     func loadFallback() {
         if let error = session.error { showError(error) }
         if let url = session.localURL {
-            return load(document: Document(url: url))
+            return load(document: PTPDFDoc(filepath: url.path))
         }
 
         guard !fallbackUsed else { return }
@@ -121,17 +125,18 @@ public class DocViewerViewController: UIViewController {
         session.loadDocument(downloadURL: fallbackURL)
     }
 
-    func load(document: Document) {
-        pdf.document = document
-        pdf.documentViewController?.scrollToSpread(at: 0, scrollPosition: .start, animated: false)
+    func load(document: PTPDFDoc) {
+        pdf.openDocument(with: document)
+//        pdf.document = document
+//        pdf.documentViewController?.scrollToSpread(at: 0, scrollPosition: .start, animated: false)
         pdf.view.isHidden = false
         loadingView.isHidden = true
 
-        let share = UIBarButtonItem(barButtonSystemItem: .action, target: pdf.activityButtonItem.target, action: pdf.activityButtonItem.action)
-        share.accessibilityIdentifier = "DocViewer.shareButton"
-        let search = UIBarButtonItem(barButtonSystemItem: .search, target: pdf.searchButtonItem.target, action: pdf.searchButtonItem.action)
-        search.accessibilityIdentifier = "DocViewer.searchButton"
-        parentNavigationItem?.rightBarButtonItems = [ share, search ]
+//        let share = UIBarButtonItem(barButtonSystemItem: .action, target: pdf.activityButtonItem.target, action: pdf.activityButtonItem.action)
+//        share.accessibilityIdentifier = "DocViewer.shareButton"
+//        let search = UIBarButtonItem(barButtonSystemItem: .search, target: pdf.searchButtonItem.target, action: pdf.searchButtonItem.action)
+//        search.accessibilityIdentifier = "DocViewer.searchButton"
+//        parentNavigationItem?.rightBarButtonItems = [ share, search ]
     }
 
     public func showError(_ error: Error) {
@@ -146,6 +151,9 @@ private let disabledMenuItems: [String] = [
     TextMenu.annotationMenuOpacity.rawValue,
     TextMenu.annotationMenuThickness.rawValue,
 ]
+
+extension DocViewerViewController: PTDocumentViewControllerDelegate {
+}
 
 extension DocViewerViewController: PDFViewControllerDelegate {
     // swiftlint:disable function_parameter_count
@@ -228,9 +236,12 @@ extension DocViewerViewController: PDFViewControllerDelegate {
 
 extension DocViewerViewController: DocViewerAnnotationProviderDelegate {
     func annotationDidExceedLimit(annotation: APIDocViewerAnnotation) {
-        guard annotation.type == .ink, pdf.annotationStateManager.state == .ink, let variant = pdf.annotationStateManager.variant else { return }
-        pdf.annotationStateManager.toggleState(.ink, variant: variant)
-        pdf.annotationStateManager.toggleState(.ink, variant: variant)
+        guard pdf.toolManager.tool?.annotType == .some(.ink) else { return }
+        pdf.toolManager.tool = nil
+        pdf.toolManager.changeTool(PTInk.self)
+//        guard annotation.type == .ink, pdf.annotationStateManager.state == .ink, let variant = pdf.annotationStateManager.variant else { return }
+//        pdf.annotationStateManager.toggleState(.ink, variant: variant)
+//        pdf.annotationStateManager.toggleState(.ink, variant: variant)
     }
 
     @IBAction func syncAnnotations() {

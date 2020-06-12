@@ -64,10 +64,15 @@ def react_native_pods
   pod 'RNSound', :path => './rn/Teacher/node_modules/react-native-sound'
 end
 
+def pdf_tron
+  pod 'PDFNet', podspec: 'https://www.pdftron.com/downloads/ios/cocoapods/pdfnet/latest.podspec'
+end
+
 abstract_target 'defaults' do
   use_frameworks!
 
   react_native_pods
+  pdf_tron
 
   pod 'Marshal', '~> 1.2.7'
   pod 'Cartography', '~> 3.1'
@@ -92,28 +97,36 @@ abstract_target 'defaults' do
     project 'rn/Teacher/ios/Teacher.xcodeproj'
     firebase_pods
   end
-  
+
   target 'TeacherTests' do
     project 'rn/Teacher/ios/Teacher.xcodeproj'
     firebase_pods
   end
-  
+
   target 'Student' do
     project 'Student/Student.xcodeproj'
     firebase_pods
     pod 'lottie-ios', '~> 3.1.8'
   end
-  
+
   target 'StudentUnitTests' do
     project 'Student/Student.xcodeproj'
     firebase_pods
     pod 'lottie-ios', '~> 3.1.8'
   end
-  
+
   target 'CanvasCore' do
     project 'CanvasCore/CanvasCore.xcodeproj'
     canvas_crashlytics_rn_firebase_pods
   end
+
+end
+
+target 'Core' do
+  use_frameworks!
+
+  project 'Core/Core.xcodeproj'
+  pdf_tron
 end
 
 post_install do |installer|

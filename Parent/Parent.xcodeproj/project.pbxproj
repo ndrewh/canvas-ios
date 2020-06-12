@@ -1268,6 +1268,7 @@
 				3B36A2DC2322C26A00599A1E /* Frameworks */,
 				3B36A2DD2322C26A00599A1E /* Resources */,
 				81618D31A0BD56EE9423C713 /* [CP] Embed Pods Frameworks */,
+				E92448AD40325702A6F58D69 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1291,6 +1292,7 @@
 				ADAFC3B5838CDB330E525883 /* [CP] Embed Pods Frameworks */,
 				F9B947062215E9CF0083E660 /* Carthage Copy Frameworks */,
 				3BA649CA242281970047D8DC /* FirebaseCrashlytics */,
+				DFDF7962C50A9114FD49E84F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1557,6 +1559,40 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-defaults-Parent/Pods-defaults-Parent-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DFDF7962C50A9114FD49E84F /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-Parent/Pods-defaults-Parent-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-Parent/Pods-defaults-Parent-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-defaults-Parent/Pods-defaults-Parent-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E92448AD40325702A6F58D69 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-ParentUnitTests/Pods-defaults-ParentUnitTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-defaults-ParentUnitTests/Pods-defaults-ParentUnitTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-defaults-ParentUnitTests/Pods-defaults-ParentUnitTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F9B947062215E9CF0083E660 /* Carthage Copy Frameworks */ = {
