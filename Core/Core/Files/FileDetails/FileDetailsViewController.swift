@@ -45,6 +45,7 @@ public class FileDetailsViewController: UIViewController, CoreWebViewLinkDelegat
     var remoteURL: URL?
     var localURL: URL?
     var pdfAnnotationsMutatedMoveToDocsDirectory = false
+    var onShake: (() -> Void)?
 
     lazy var files = env.subscribe(GetFile(context: context, fileID: fileID)) { [weak self] in
         self?.update()
@@ -329,6 +330,24 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
         let document = PTPDFDoc(filepath: url.path)!
         let controller = PTDocumentViewController()
         controller.openDocument(with: document)
+        controller.automaticallySavesDocument = true
+        controller.isBottomToolbarEnabled = false
+        controller.pdfViewCtrl.enableUndoRedo()
+        let tools: [PTAnnotBarButton] = [
+            .stickynote,
+            .highlight,
+            .freetext,
+            .strikeout,
+            .freehand,
+            .rectangle,
+            .eraser,
+            .close,
+            .pan,
+        ]
+        controller.annotationToolbar.precedenceArray = tools.map(\.rawValue).map { NSNumber(value: $0) }
+        onShake = { [weak self, weak controller] in
+            self?.confirmUndo { controller?.undoManager?.undo() }
+        }
 //        document.annotationSaveMode = .embedded
 //        let controller = PDFViewController(document: document, configuration: PDFConfiguration { (builder) -> Void in
 //            docViewerConfigurationBuilder(builder)
@@ -350,20 +369,20 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
 //            let appearance = UIToolbarAppearance()
 //            appearance.configureWithOpaqueBackground()
 //            appearance.backgroundColor = navigationController?.navigationBar.barTintColor
-//            controller.annotationToolbarController?.toolbar.standardAppearance = appearance
+//            controller.annotationToolbar.standardAppearance = appearance
 //        }
         controller.delegate = self
         embed(controller, in: contentView)
         addPDFAnnotationChangeNotifications()
 
-//        let share = UIBarButtonItem(barButtonSystemItem: .action, target: controller.activityButtonItem.target, action: controller.activityButtonItem.action)
-//        share.accessibilityIdentifier = "FileDetails.shareButton"
-//        let annotate = controller.annotationButtonItem
-//        annotate.image = .icon(.highlighter, .line)
-//        annotate.accessibilityIdentifier = "FileDetails.annotateButton"
-//        let search = controller.searchButtonItem
-//        search.accessibilityIdentifier = "FileDetails.searchButton"
-//        navigationItem.rightBarButtonItems = [ share, annotate, search ]
+        let share = UIBarButtonItem(barButtonSystemItem: .action, target: controller.shareButtonItem.target, action: controller.shareButtonItem.action)
+        share.accessibilityIdentifier = "FileDetails.shareButton"
+        let annotate = controller.annotationButtonItem
+        annotate.image = .icon(.highlighter, .line)
+        annotate.accessibilityIdentifier = "FileDetails.annotateButton"
+        let search = controller.searchButtonItem
+        search.accessibilityIdentifier = "FileDetails.searchButton"
+        navigationItem.rightBarButtonItems = [ share, annotate, search ]
         NotificationCenter.default.post(name: .init("FileViewControllerBarButtonItemsDidChange"), object: nil)
 
         doneLoading()
@@ -434,5 +453,22 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
     @objc
     func annotationChangedNotification(notification: Notification) {
         pdfAnnotationsMutatedMoveToDocsDirectory = true
+    }
+
+    public override var canBecomeFirstResponder: Bool { true }
+
+    public override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        if motion == .motionShake {
+            onShake?()
+        }
+    }
+
+    func confirmUndo(confirmedBlock: @escaping () -> Void) {
+        let alert = UIAlertController(title: NSLocalizedString("Undo Edit", bundle: .core, comment: ""), message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Undo", bundle: .core, comment: ""), style: .default) { _ in
+            confirmedBlock()
+        })
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", bundle: .core, comment: ""), style: .cancel, handler: nil))
+        env.router.show(alert, from: self)
     }
 }

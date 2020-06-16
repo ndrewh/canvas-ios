@@ -132,11 +132,11 @@ public class DocViewerViewController: UIViewController {
         pdf.view.isHidden = false
         loadingView.isHidden = true
 
-//        let share = UIBarButtonItem(barButtonSystemItem: .action, target: pdf.activityButtonItem.target, action: pdf.activityButtonItem.action)
-//        share.accessibilityIdentifier = "DocViewer.shareButton"
-//        let search = UIBarButtonItem(barButtonSystemItem: .search, target: pdf.searchButtonItem.target, action: pdf.searchButtonItem.action)
-//        search.accessibilityIdentifier = "DocViewer.searchButton"
-//        parentNavigationItem?.rightBarButtonItems = [ share, search ]
+        let share = UIBarButtonItem(barButtonSystemItem: .action, target: pdf.freehandButtonItem.target, action: pdf.freehandButtonItem.action)
+        share.accessibilityIdentifier = "DocViewer.shareButton"
+        let search = UIBarButtonItem(barButtonSystemItem: .search, target: pdf.searchButtonItem.target, action: pdf.searchButtonItem.action)
+        search.accessibilityIdentifier = "DocViewer.searchButton"
+        parentNavigationItem?.rightBarButtonItems = [ share, search ]
     }
 
     public func showError(_ error: Error) {
@@ -153,6 +153,15 @@ private let disabledMenuItems: [String] = [
 ]
 
 extension DocViewerViewController: PTDocumentViewControllerDelegate {
+}
+
+extension DocViewerViewController: PTToolManagerDelegate {
+    public func viewController(for toolManager: PTToolManager) -> UIViewController {
+        return self
+    }
+
+    public func toolManager(_ toolManager: PTToolManager, shouldShowMenu menuController: UIMenuController, forAnnotation annotation: PTAnnot?, onPageNumber pageNumber: UInt) -> Bool {
+    }
 }
 
 extension DocViewerViewController: PDFViewControllerDelegate {
