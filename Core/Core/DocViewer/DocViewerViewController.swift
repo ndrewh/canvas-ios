@@ -161,6 +161,11 @@ extension DocViewerViewController: PTToolManagerDelegate {
     }
 
     public func toolManager(_ toolManager: PTToolManager, shouldShowMenu menuController: UIMenuController, forAnnotation annotation: PTAnnot?, onPageNumber pageNumber: UInt) -> Bool {
+        return true
+    }
+
+    public func toolManagerToolChanged(_ toolManager: PTToolManager) {
+        print("tool changed")
     }
 }
 

@@ -320,6 +320,31 @@ extension FileDetailsViewController: QLPreviewControllerDataSource, QLPreviewCon
     }
 }
 
+extension FileDetailsViewController: PTToolManagerDelegate {
+    public func viewController(for toolManager: PTToolManager) -> UIViewController {
+        return self
+    }
+
+    public func toolManager(
+        _ toolManager: PTToolManager,
+        shouldShowMenu menuController: UIMenuController,
+        forAnnotation annotation: PTAnnot?,
+        onPageNumber pageNumber: UInt
+    ) -> Bool {
+        return true
+    }
+}
+
+extension FileDetailsViewController: PTAnnotationToolbarDelegate {
+    public func annotationToolbarDidCancel(_ annotationToolbar: PTAnnotationToolbar) {
+        annotationToolbar.isHidden = true
+    }
+
+    public func position(for bar: UIBarPositioning) -> UIBarPosition {
+        return .bottom
+    }
+}
+
 extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewControllerDelegate {
     func embedPDFView(for url: URL) {
         guard DocViewerViewController.hasPSPDFKitLicense else {
@@ -327,8 +352,10 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
         }
         stylePSPDFKit()
 
+        PTToolsSettingsManager.shared.freehandUsesPencilKit = false
         let document = PTPDFDoc(filepath: url.path)!
         let controller = PTDocumentViewController()
+        controller.toolManager.delegate = self
         controller.openDocument(with: document)
         controller.automaticallySavesDocument = true
         controller.isBottomToolbarEnabled = false
@@ -345,6 +372,10 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
             .pan,
         ]
         controller.annotationToolbar.precedenceArray = tools.map(\.rawValue).map { NSNumber(value: $0) }
+        controller.annotationToolbar.delegate = self
+        controller.annotationToolbar.tintColor = navigationController?.navigationBar.tintColor
+        controller.annotationToolbar.barTintColor = navigationController?.navigationBar.barTintColor
+        controller.annotationToolbar.isTranslucent = false
         onShake = { [weak self, weak controller] in
             self?.confirmUndo { controller?.undoManager?.undo() }
         }
