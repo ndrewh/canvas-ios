@@ -48,6 +48,13 @@ workflows:
         - workflows: danger-yarn
 
     - cache-pull: {}
+    - script:
+        title: Expand cache
+        is_skippable: true
+        inputs:
+        - runner_bin: "/bin/zsh"
+        - content: |-
+            tar -xPzf cache.tgz
     - &set-mtime
       script-runner:
         title: Set file mtime
@@ -63,13 +70,12 @@ workflows:
             #!/bin/zsh
             set -euxo pipefail
 
-            brew tap mxcl/made
             brew tap thii/xcbeautify https://github.com/thii/xcbeautify.git
 
             brew reinstall swiftlint jq xcbeautify
 
             pip3 install awscli
-            rm -rf "$BITRISE_SOURCE_DIR/Pods/Target Support Files/yoga"
+            # rm -rf "$BITRISE_SOURCE_DIR/Pods/Target Support Files/yoga"
     - script:
         title: Create temporary build links
         is_skippable: true
@@ -88,6 +94,7 @@ workflows:
         title: rn yarn install
     - &cocoapods
       cocoapods-install:
+        run_if: false
         inputs:
         - verbose: 'false'
     - &build-citests
@@ -287,6 +294,8 @@ workflows:
             #!/bin/zsh
             set -euxo pipefail
 
+            export IgnoreFileSystemDeviceInodeChanges=1
+
             ./scripts/run-ui-tests.sh --build
             SCHEME=IPadTests \
             DEVICE_NAME='iPad Air (3rd generation)' \
@@ -303,14 +312,18 @@ workflows:
             echo $GIT_CLONE_COMMIT_HASH > cache-metadata/cache-commit-hash
             # always cache
             uuidgen > cache-metadata/cache-fingerprint
+
+            rm -f cache.tgz
+            tar -cPzf cache.tgz \
+                ~/Library/Developer/Xcode/DerivedData \
+                rn/Teacher/node_modules \
+                /usr/local/Homebrew
     - cache-push:
         inputs:
-        - compress_archive: true
+        - compress_archive: false
         - cache_paths: |-
             cache-metadata/ -> cache-metadata/cache-fingerprint
-            rn/Teacher/node_modules/ -> cache-metadata/cache-fingerprint
-            ~/Library/Developer/Xcode/DerivedData -> cache-metadata/cache-fingerprint
-            /usr/local/Homebrew -> cache-metadata/cache-fingerprint
+            cache.tgz -> cache-metadata/cache-fingerprint
 
   nightly:
     steps:
