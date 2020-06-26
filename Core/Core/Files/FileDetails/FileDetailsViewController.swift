@@ -164,7 +164,7 @@ public class FileDetailsViewController: UIViewController, CoreWebViewLinkDelegat
 
     @IBAction func viewModules() {
         guard let context = context else { return }
-        env.router.route(to: Route.modules(forCourse: context.id), from: self)
+        env.router.route(to: "/courses/\(context.id)/modules", from: self)
     }
 
     @objc func share(_ sender: UIBarButtonItem) {
