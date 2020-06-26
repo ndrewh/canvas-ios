@@ -1709,7 +1709,6 @@
 				2CAF1B101F72AEDB007225DF /* Frameworks */,
 				2CAF1B111F72AEDB007225DF /* Headers */,
 				2CAF1B121F72AEDB007225DF /* Resources */,
-				1E61B583BB9398956B22CF3E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1815,24 +1814,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1E61B583BB9398956B22CF3E /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-defaults-CanvasCore/Pods-defaults-CanvasCore-resources.sh",
-				"${PODS_ROOT}/PDFNet/Tools-Localization",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Tools-Localization",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-defaults-CanvasCore/Pods-defaults-CanvasCore-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		270E0B49471036954CD69F92 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

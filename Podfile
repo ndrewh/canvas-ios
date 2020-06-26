@@ -72,7 +72,7 @@ abstract_target 'defaults' do
   use_frameworks!
 
   react_native_pods
-  pdf_tron
+  # pdf_tron
 
   pod 'Marshal', '~> 1.2.7'
   pod 'Cartography', '~> 3.1'
@@ -120,13 +120,6 @@ abstract_target 'defaults' do
     canvas_crashlytics_rn_firebase_pods
   end
 
-end
-
-target 'Core' do
-  use_frameworks!
-
-  project 'Core/Core.xcodeproj'
-  pdf_tron
 end
 
 post_install do |installer|
