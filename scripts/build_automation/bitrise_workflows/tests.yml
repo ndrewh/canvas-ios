@@ -110,6 +110,9 @@ workflows:
             export CODE_SIGNING_REQUIRED=NO
             export IgnoreFileSystemDeviceInodeChanges=1
 
+            echo pausing forever...
+            bash -c "while true; do sleep 10; done"
+
             xcodebuild \
                 -workspace Canvas.xcworkspace \
                 -scheme CITests \
