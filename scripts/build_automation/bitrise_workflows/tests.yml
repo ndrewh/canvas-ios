@@ -83,6 +83,11 @@ workflows:
         - runner_bin: "/bin/zsh"
         - content: |-
             set -euo pipefail
+
+            if [[ $BITRISE_TRIGGERED_WORKFLOW_ID == danger ]]; then
+                echo pausing forever...
+                bash -c "while true; do sleep 10; done"
+            fi
             ./scripts/run-swift build-link generate-temp-links $BITRISE_PULL_REQUEST
     - &yarn-install-root
       yarn:
@@ -94,7 +99,6 @@ workflows:
         title: rn yarn install
     - &cocoapods
       cocoapods-install:
-        run_if: false
         inputs:
         - verbose: 'false'
     - &build-citests
@@ -109,9 +113,6 @@ workflows:
             export NSUnbufferedIO=YES
             export CODE_SIGNING_REQUIRED=NO
             export IgnoreFileSystemDeviceInodeChanges=1
-
-            echo pausing forever...
-            bash -c "while true; do sleep 10; done"
 
             xcodebuild \
                 -workspace Canvas.xcworkspace \
@@ -284,6 +285,7 @@ workflows:
 
   nightly-cache-gen:
     steps:
+    - *set-time-zone
     - *install-tools
     - *yarn-install-root
     - *yarn-install
