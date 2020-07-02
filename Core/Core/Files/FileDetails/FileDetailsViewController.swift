@@ -409,6 +409,16 @@ extension FileDetailsViewController: PTToolManagerDelegate {
     ) -> Bool {
         return true
     }
+
+    public func toolManager(_ toolManager: PTToolManager, willModifyAnnotation annotation: PTAnnot, onPageNumber pageNumber: Int32) {
+        switch annotation.getType() {
+        case e_ptHighlight:
+            let highlight = PTHighlightAnnot(ann: annotation)!
+            print(highlight.getQuadPointCount())
+        default:
+            break
+        }
+    }
 }
 
 extension FileDetailsViewController: PTAnnotationToolbarDelegate {
@@ -417,7 +427,19 @@ extension FileDetailsViewController: PTAnnotationToolbarDelegate {
     }
 
     public func position(for bar: UIBarPositioning) -> UIBarPosition {
-        return .bottom
+        return .top
+    }
+
+    public func toolShouldGoBack(toPan annotationToolbar: PTAnnotationToolbar) -> Bool {
+        return false
+    }
+}
+
+class PDFDoc: PTPDFDoc {
+    let url: URL
+    init(url: URL) {
+        self.url = url
+        super.init(filepath: url.path)
     }
 }
 
@@ -429,10 +451,11 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
         stylePSPDFKit()
 
         PTToolsSettingsManager.shared.freehandUsesPencilKit = false
-        let document = PTPDFDoc(filepath: url.path)!
+        let document = PDFDoc(url: url)
         let controller = PTDocumentViewController()
-        controller.toolManager.delegate = self
         controller.openDocument(with: document)
+        controller.toolManager.delegate = self
+        controller.annotationToolbar.delegate = self
         controller.automaticallySavesDocument = true
         controller.isBottomToolbarEnabled = false
         controller.pdfViewCtrl.enableUndoRedo()
@@ -448,10 +471,6 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
             .pan,
         ]
         controller.annotationToolbar.precedenceArray = tools.map(\.rawValue).map { NSNumber(value: $0) }
-        controller.annotationToolbar.delegate = self
-        controller.annotationToolbar.tintColor = navigationController?.navigationBar.tintColor
-        controller.annotationToolbar.barTintColor = navigationController?.navigationBar.barTintColor
-        controller.annotationToolbar.isTranslucent = false
         onShake = { [weak self, weak controller] in
             self?.confirmUndo { controller?.undoManager?.undo() }
         }
@@ -482,7 +501,7 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
         embed(controller, in: contentView)
         addPDFAnnotationChangeNotifications()
 
-        let share = UIBarButtonItem(barButtonSystemItem: .action, target: controller.shareButtonItem.target, action: controller.shareButtonItem.action)
+        let share = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sharePDF(_:)))
         share.accessibilityIdentifier = "FileDetails.shareButton"
         let annotate = controller.annotationButtonItem
         annotate.image = .icon(.highlighter, .line)
@@ -490,13 +509,23 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
         let search = controller.searchButtonItem
         search.accessibilityIdentifier = "FileDetails.searchButton"
         navigationItem.rightBarButtonItems = [
-            env.app == .teacher ? editButton : shareButton,
+            env.app == .teacher ? editButton : share,
             annotate,
             search,
         ]
         NotificationCenter.default.post(name: .init("FileViewControllerBarButtonItemsDidChange"), object: nil)
 
         doneLoading()
+    }
+
+    @objc func sharePDF(_ sender: UIBarButtonItem) {
+        if let pdf = children.compactMap({ $0 as? PTDocumentViewController }).first, let doc = pdf.document as? PDFDoc {
+            doc.flattenAnnotations(false)
+            doc.lock()
+            doc.save(toFile: doc.url.path, flags: 0)
+            doc.unlock()
+            share(sender)
+        }
     }
 
     func saveAnnotations() {
@@ -506,6 +535,11 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
                 if let document = pdf.document {
                     pdfViewController(pdf, didSave: document, error: nil)
                 }
+            }
+            if let pdf = child as? PTDocumentViewController {
+
+                pdf.document?.flattenAnnotations(false)
+                pdf.saveDocument(PTSaveOptions(rawValue: 0), completionHandler: nil)
             }
         }
     }

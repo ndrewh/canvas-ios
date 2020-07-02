@@ -109,7 +109,41 @@ public class DocViewerViewController: UIViewController {
             }
         }
         let doc = PTPDFDoc(filepath: localURL.path)!
+        add(annotations: annotations, to: doc)
         load(document: doc)
+    }
+
+    func add(annotations: [APIDocViewerAnnotation], to doc: PTPDFDoc) {
+        for annotation in annotations {
+            let page = doc.getPage(UInt32(annotation.page + 1))
+            let rect = annotation.rect.flatMap(rectFrom) ?? .zero
+            let ptRect = PTPDFRect(x1: Double(rect.minX), y1: Double(rect.minY), x2: Double(rect.maxX), y2: Double(rect.maxY))
+            let annot: PTAnnot
+            switch annotation.type {
+            case .square:
+                print("RECT:", annotation.rect ?? [])
+                annot = PTSquare.create(
+                    doc.getSDFDoc(),
+                    pos: ptRect
+                )!
+                annot.setBorderStyle(PTBorderStyle(s: e_ptsolid, b_width: annotation.width ?? 1.0, b_hr: 0, b_vr: 0), oldStyleOnly: false)
+            case .highlight:
+                let highlight = PTHighlightAnnot.create(doc.getSDFDoc(), pos: ptRect)!
+                let coords = annotation.coords ?? []
+                for (i, coord) in coords.enumerated() {
+                    let rect = rectFrom(coord)
+                    highlight.setQuadPoint(Int32(i), qp: PTQuadPoint(r: rect.pt_rect))
+                }
+                annot = highlight
+            default:
+                continue
+            }
+            if let color = UIColor(hexString: annotation.color) {
+                annot.setColor(PTColorDefaults.colorPt(from: color), numcomp: 3)
+            }
+            annot.refreshAppearance()
+            page?.annotPushBack(annot)
+        }
     }
 
     func loadFallback() {
@@ -275,5 +309,23 @@ extension DocViewerViewController: DocViewerAnnotationProviderDelegate {
             ? NSLocalizedString("Saving...", bundle: .core, comment: "")
             : NSLocalizedString("All annotations saved.", bundle: .core, comment: ""),
         for: .normal)
+    }
+}
+
+private func rectFrom(_ points: [[Double]]) -> CGRect {
+    var minX = Double.infinity, minY = Double.infinity, maxX = 0.0, maxY = 0.0
+    for point in points {
+        guard point.count == 2 else { continue }
+        minX = min(minX, point[0])
+        minY = min(minY, point[1])
+        maxX = max(maxX, point[0])
+        maxY = max(maxY, point[1])
+    }
+    return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+}
+
+extension CGRect {
+    var pt_rect: PTPDFRect {
+        PTPDFRect(x1: Double(minX), y1: Double(minY), x2: Double(maxX), y2: Double(maxY))
     }
 }
