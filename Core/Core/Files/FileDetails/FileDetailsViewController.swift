@@ -450,7 +450,7 @@ extension FileDetailsViewController: PDFViewControllerDelegate, PTDocumentViewCo
         }
         stylePSPDFKit()
 
-        PTToolsSettingsManager.shared.freehandUsesPencilKit = false
+        PTToolsSettingsManager.shared.freehandUsesPencilKit = true
         let document = PDFDoc(url: url)
         let controller = PTDocumentViewController()
         controller.openDocument(with: document)
