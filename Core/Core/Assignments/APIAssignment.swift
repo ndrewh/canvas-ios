@@ -46,6 +46,7 @@ public struct APIAssignment: Codable, Equatable {
     let assignment_group_id: ID?
     let all_dates: [APIAssignmentDate]?
     let allowed_attempts: Int?
+    let score_statistics: APIAssignmentScoreStatistics?
 }
 
 // https://canvas.instructure.com/doc/api/assignments.html#AssignmentDate
@@ -56,6 +57,12 @@ public struct APIAssignmentDate: Codable, Equatable {
     let due_at: Date?
     let unlock_at: Date?
     let lock_at: Date?
+}
+
+public struct APIAssignmentScoreStatistics: Codable, Equatable {
+    let mean: Double
+    let min: Double
+    let max: Double
 }
 
 public enum GradingType: String, Codable {
@@ -91,7 +98,8 @@ extension APIAssignment {
         rubric_settings: APIRubricSettings? = nil,
         assignment_group_id: ID? = nil,
         all_dates: [APIAssignmentDate]? = nil,
-        allowed_attempts: Int? = -1
+        allowed_attempts: Int? = -1,
+        score_statistics: APIAssignmentScoreStatistics? = nil
     ) -> APIAssignment {
 
         var submissionList: APIList<APISubmission>?
@@ -127,7 +135,8 @@ extension APIAssignment {
             rubric_settings: rubric_settings,
             assignment_group_id: assignment_group_id,
             all_dates: all_dates,
-            allowed_attempts: allowed_attempts
+            allowed_attempts: allowed_attempts,
+            score_statistics: score_statistics
         )
     }
 }
@@ -151,6 +160,20 @@ extension APIAssignmentDate {
         )
     }
 }
+
+extension APIAssignmentScoreStatistics {
+    public static func make(
+        mean: Double = 2.0,
+        min: Double = 1.0,
+        max: Double = 5.0
+    ) -> APIAssignmentScoreStatistics {
+        return APIAssignmentScoreStatistics(
+            mean: mean,
+            min: min,
+            max: max
+        )
+    }
+}
 #endif
 
 // https://canvas.instructure.com/doc/api/assignments.html#method.assignments_api.show
@@ -170,7 +193,7 @@ public struct GetAssignmentRequest: APIRequestable {
     }
 
     public enum GetAssignmentInclude: String {
-        case submission, overrides
+        case submission, overrides, score_statistics
     }
 
     public var path: String {
@@ -232,6 +255,7 @@ public struct GetAssignmentsRequest: APIRequestable {
         case observed_users
         case submission
         case all_dates
+        case score_statistics
     }
 
     public typealias Response = [APIAssignment]
